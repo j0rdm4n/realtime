@@ -187,7 +187,7 @@ def persist(events):
         p.expire(event.rendered, KEY_EXPIRE)
     p.execute()
     # throw it into cube for later analysis
-    data = json.dumps([{'time': e.utc
+    data = json.dumps([{'time': e.utc,
                         'type': 'gh',
                         'data':e.__dict__} for e in events])
     r = requests.post(CUBE_COLLECTOR, data=data)
