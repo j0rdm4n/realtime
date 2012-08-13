@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block style %}
+<link href="/static/css/cubism.css" rel="stylesheet">
+{% endblock %}
+
+{% block script %}
+<script src="/static/js/d3.v2.js"></script>
+<script src="/static/js/cubism.v1.js"></script>
+<script>
+
+//
+var step = +cubism.option("step", 1e4);
+
+//
+var context = cubism.context()
+    .step(step)
+    .size(1440);
+
+//
+var host = "http://doda.co:1081"
+var cube = context.cube(host);
+
+// Add top and bottom axes to display the time.
+d3.select("body").selectAll(".axis")
+    .data(["top", "bottom"])
+  .enter().append("div")
+    .attr("class", function(d) { return d + " axis"; })
+    .each(function(d) { d3.select(this).call(context.axis().ticks(12).orient(d)); });
+
+// Add a mouseover rule.
+d3.select("body").append("div")
+    .attr("class", "rule")
+    .call(context.rule());
+
+//
+d3.json(host+"/1.0/types", function(types) {
+  d3.select("body").insert("div", ".bottom")
+      .attr("class", "group")
+      .call(function() { this.append("header").text("incoming events (/s)"); })
+    .selectAll(".horizon")
+      .data(types)
+    .enter().append("div")
+      .attr("class", "horizon")
+    .call(context.horizon()
+      .metric(function(d) { return cube.metric("sum(" + d + ")").divide(step / 1e3); }));
+});
+
+// On mousemove, reposition the chart values to match the rule.
+context.on("focus", function(i) {
+  d3.selectAll(".value").style("right", i == null ? null : context.size() - i + "px");
+});
+
+// Initialize the step menu's selection.
+d3.selectAll("#step option").property("selected", function() {
+  return this.value == step;
+});
+
+// Update the location on step change.
+d3.select("#step").on("change", function() {
+  window.location = "?step=" + this.value + "&" + location.search.replace(/[?&]step=[^&]*(&|$)/g, "$1").substring(1);
+});
+
+</script>
+{% endblock %}
+
+{% block body %}
+<select id="step">
+  <option value="1e4">10 seconds</option>
+  <option value="6e4">1 minute</option>
+  <option value="3e5">5 minutes</option>
+</select>
+{% endblock %}

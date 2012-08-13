@@ -1,0 +1,27 @@
+.profile {
+    height: 30px;
+    width: 30px;
+    }
+
+p {
+    font-size: 18px;
+    padding-top:4px;
+    padding-left:4px;
+    width:100%;
+}
+
+.inlinebox {
+	display: -moz-inline-stack;
+	display: inline-block;
+	vertical-align: top;
+	zoom: 1;
+	*display: inline;
+//	width: 49%;
+	min-height: 30px;
+	_height: 30px;
+}
+
+.thumbnail {
+    border:none;
+}
+

@@ -1,0 +1,11 @@
+.container {
+    width:100%;
+}
+
+li.photo {
+    margin-left:19px;
+}
+
+.photos {
+    margin:0 auto;
+}
