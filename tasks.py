@@ -168,14 +168,12 @@ class Event(object):
 
 @task
 def get_events():
-    queried = [Event(d) for d in gh._get(GITHUB_TIMELINE).json]
-    print len(queried)
+    events = [Event(d) for d in gh._get(GITHUB_TIMELINE).json]
+    print len(events)
     # de-dupe w/ own string representation on redis
-    p = red.pipeline()
-    for event in queried:
-        p.setnx(event.redis_repr, '')
-    events = [event for event, not_in_redis in zip(queried, p.execute())
-              if event.rendered and not_in_redis]
+    # setnx returns True if the key is new
+    events = [event for event in events if event.rendered and
+              red.setnx(event.redis_repr, '')]
     print len(events)
     
     for i, event in enumerate(events):
