@@ -2,7 +2,6 @@ $(document).ready(function () {
     var $photos = $('.photos');
     var max_containers = 20;
     var ej = new EJS({'url':'/static/js/templates/photo.ejs'});
-    EJS.config({'cache':false});
     var insert = function () {
 	var $container = $('<div class="container"></div>')
 	var max_children = 5;
