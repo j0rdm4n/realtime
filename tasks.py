@@ -168,7 +168,7 @@ class Event(object):
 
 @task
 def get_events():
-    events = [Event(d) for d in gh._get(GITHUB_TIMELINE).json]
+    events = [Event(d) for d in gh._get(GITHUB_TIMELINE)]
     print len(events)
     # de-dupe w/ own string representation on redis
     # setnx returns True if the key is new
