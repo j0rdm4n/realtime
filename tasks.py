@@ -30,10 +30,7 @@ gh.login(*credentials)
 
 ANON = '///' # placeholder that can't be a username
 GITHUB_TIMELINE = 'https://github.com/timeline.json'
-GRAVATAR_SIZE = 140
 CUBE_COLLECTOR = 'http://localhost:1080/1.0/event/put'
-with open('default_gravatar.png') as f:
-    DEFAULT_GRAVATAR = f.read()
 
 class Event(object):
     '''used to render the JSON object received from GitHub's API into something that's nice to look at'''
@@ -103,13 +100,6 @@ class Event(object):
         '''the json that is pushed to the client'''
         # TODO: push only whats necessary
         return json.dumps(self.__dict__)
-
-    def request_gravatar(self):
-        data = get_gravatar(self.gravatar_id)
-        self.got_img = bool(data)
-        if not self.got_img:
-            data = DEFAULT_GRAVATAR
-        self.img = b64encode(data)
 
     @property
     def redis_repr(self):
@@ -188,7 +178,6 @@ def get_events():
 @task
 def process_event(event):
     '''request the gravatar'''
-    event.request_gravatar()
     red.publish("all", event.json)
     persist.delay(event)
     
@@ -206,13 +195,6 @@ def persist(event):
     r = requests.post(CUBE_COLLECTOR, data=data)
     r.raise_for_status()
     print r.ok
-
-@task
-@lru_cache(maxsize=300)
-def get_gravatar(id):
-    r = requests.get('http://www.gravatar.com/avatar/{id}?s={size}&d={default}'.format(id=id, size=GRAVATAR_SIZE, default=404))
-    if r.ok:
-        return r.content
 
 if __name__ == '__main__':
     pass
