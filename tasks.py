@@ -18,6 +18,7 @@ pool = redis.ConnectionPool()
 red = redis.StrictRedis(connection_pool=pool)
 KEY_EXPIRE = 120
 REDIS_NAME = 'waves:'
+PUSHED_COUNTER = REDIS_NAME + 'pushed'
 # clear out redis
 for k in red.keys(REDIS_NAME + '*'):
     red.delete(k)
@@ -195,7 +196,7 @@ def process_event(event):
 def persist(event):
     '''do data persistence on stuff that is nice-to-have but not critical
     for base functionality (streaming events into redis)'''
-    pushed = red.incr(REDIS_NAME + 'pushed')
+    pushed = red.incr(PUSHED_COUNTER)
     # so redis doesnt fill up
     red.expire(event.redis_repr, KEY_EXPIRE)
     # throw it into cube for later analysis
