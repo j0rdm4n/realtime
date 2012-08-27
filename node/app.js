@@ -20,11 +20,13 @@ sub.on("message", function(channel, key) {
 })
 io.sockets.on('connection', function (socket) {
     sub.on("message", function(channel, key) {
+	console.log('news');
 	socket.emit('news', key);
     })
     socket.on('give', function (n) {
 	n = parseInt(n, 10);
 	for (var i=n;i>=0;i--) {
+	    console.log('given');
             socket.emit('given', cached[i]);
 	}
     })
